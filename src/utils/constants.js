@@ -139,6 +139,8 @@ const MODELS = {
   USER: "Users",
   PROJECTS: "Projects",
   ProjectMember: "ProjectMembers",
+  
+  Post:"Posts",
   ROLE: "Roles",
   PROJECTIMAGE: "ProjectImages"
 };

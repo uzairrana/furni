@@ -9,6 +9,7 @@ const cors = require("cors");
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const fileUpload = require("express-fileupload");
+
 var passport = require("passport");
 const { getJwtStrategy } = require("./config/passport");
 const globalErrorHandler = require("../src/middlewares/globalError");

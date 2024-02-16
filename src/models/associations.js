@@ -4,6 +4,7 @@ const User = require("./users");
 const Project = require("./project");
 const ProjectMember = require("./projectmember");
 const ProjectImage = require("./projectImages");
+const Post = require("./posts");
 
 ForgetPasswordToken.belongsTo(User, {
   onDelete: "CASCADE",
@@ -32,12 +33,12 @@ Project.belongsTo(User, {
 });
 Project.hasMany(ProjectMember, {
   onDelete: "CASCADE",
-  foreignKey: "id",
+  foreignKey: "projectId",
   unique: true,
 });
 ProjectMember.belongsTo(Project, {
   onDelete: "CASCADE",
-  foreignKey: "id",
+  foreignKey: "projectId",
   unique: true,
 });
 User.hasMany(ProjectMember, {
@@ -60,4 +61,22 @@ ProjectImage.belongsTo(Project, {
   onDelete: "CASCADE",
   foreignKey: "projectId",
   unique: true,
+});
+
+Project.hasMany(ProjectImage, {
+  onDelete: "CASCADE",
+  foreignKey: "projectId",
+  unique: true,
+});
+ProjectImage.belongsTo(Project, {
+  onDelete: "CASCADE",
+  foreignKey: "projectId",
+  unique: true,
+});
+
+User.hasMany(ProjectImage, {
+  foreignKey: "userId",
+});
+ProjectImage.belongsTo(User, {
+  foreignKey: "userId",
 });

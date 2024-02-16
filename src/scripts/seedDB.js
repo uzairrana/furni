@@ -2,7 +2,8 @@
 const { User } = require("../models/index");
 const bcrypt = require("bcrypt");
 const createAdmin = async () => {
-  const admin = [{
+  const admin = [
+  {
     email: "admin@gmail.com",
     password: "qwerty@1",
     roleId: 1,

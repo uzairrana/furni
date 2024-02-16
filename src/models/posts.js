@@ -1,9 +1,10 @@
-const { Model, DataTypes } = require("sequelize");
+const { Model, DataTypes } = require('sequelize')
 const sequelize = require("../config/db.config"); // If MODELS.ADMIN is defined in a separate file
-const { MODELS } = require("../utils/constants");
-class ProjectImage extends Model {
+const { MODELS } = require('../utils/constants');
+class Post extends Model {
 }
-ProjectImage.init(
+
+Post.init(
     {
         id: {
             autoIncrement: true,
@@ -13,27 +14,26 @@ ProjectImage.init(
         },
         projectId: {
             type: DataTypes.INTEGER,
-            allowNull: true,
+            allowNull: false,
             references: {
                 model: MODELS.PROJECTS,
                 key: "id",
             },
         },
-        imageUrl: {
-            type: DataTypes.STRING(225),
-        },
-        postId: {
+        userId: {
             type: DataTypes.INTEGER,
-            allowNull: true,
+            allowNull: false,
             references: {
-                model: MODELS.Post,
+                model: MODELS.USER,
                 key: "id",
             },
         },
+
     },
     {
         sequelize,
-        modelName: MODELS.PROJECTIMAGE,
+        modelName: MODELS.Post,
     }
 );
-module.exports = ProjectImage;
+
+module.exports = Post;

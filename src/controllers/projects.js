@@ -12,6 +12,7 @@ const ip = require("ip");
 const { Op } = require("sequelize");
 const { User, Project, ProjectMember } = require("../models");
 const ProjectImage = require("../models/projectImages");
+const { project } = require(".");
 
 
 const addProject = catchAsync(async (req, res, next) => {
@@ -56,52 +57,112 @@ const addProject = catchAsync(async (req, res, next) => {
         projects,
     });
 });
-
-
-
-// const asigningProject = catchAsync(async (req, res, next) => {
-//     const { clientId, venderId, manegerId, workerId, projectId } = req.body
-//     const projectAsigned = await ProjectMember.create({
-//         venderId,
-//         clientId,
-//         manegerId,
-//         workerId,
-//         projectId
-//     });
-//     return APIresponse(res, MESSAGES.USER_CREATED, {
-//         projectAsigned,
-//     });
-
-// })
-
 const asigningProject = catchAsync(async (req, res, next) => {
-    const { clientId, vendorId, managerId, workerId, projectId } = req.body;
-
-    // Create an array of objects for each user type with the corresponding user IDs
+    const { clientIds, vendorIds, managerIds, workerIds, projectId } = req.body;
     const users = [
-        { userType: 'Client', userId: clientId },
-        { userType: 'Vendor', userId: vendorId },
-        { userType: 'Manager', userId: managerId },
-        { userType: 'Worker', userId: workerId }
+        { userType: 'Client', userIds: clientIds },
+        { userType: 'Vendor', userIds: vendorIds },
+        { userType: 'Manager', userIds: managerIds },
+        { userType: 'Worker', userIds: workerIds }
     ];
-
-    // Map over the users array and create a ProjectMember for each user
     const projectAssigned = await Promise.all(
-        users.map(async ({ userType, userId }) => {
-            return await ProjectMember.create({
-                projectId,
-                userId: clientId,
-                userType
-            });
+        users.map(async ({ userType, userIds }) => {
+            return Promise.all(userIds.map(async userId => {
+                return await ProjectMember.create({
+                    projectId,
+                    userId,
+                    userType
+                });
+            }));
         })
     );
-
     return APIresponse(res, MESSAGES.USER_CREATED, {
         projectAssigned,
     });
 });
+const getAllworkerProjects = catchAsync(async (req, res, next) => {
+    const { workerIds } = req.query;
+    console.log("req.body==========>", workerIds)
+    const managerProjects = await ProjectMember.findAll({
+        where: {
+            userId: workerIds,
+            userType: "Worker",
+        },
+        include: [
+            {
+                model: Project,
+                attributes: ['id', 'title', 'descriptions', 'startDate', 'estimationTime', 'userId'],
+                foreignKey: 'projectId',
+            },
+        ],
+    });
+    return APIresponse(res, MESSAGES.USER_CREATED,
+        managerProjects,
+    );
+});
+
+const getAllmangerprojects = catchAsync(async (req, res, next) => {
+    const { managerIds } = req.query;
+    const managerProjects = await ProjectMember.findAll({
+        where: {
+            userId: managerIds,
+            userType: "Manager",
+        },
+        include: [
+            {
+                model: Project,
+                attributes: ['id', 'title', 'descriptions', 'startDate', 'estimationTime', 'userId'],
+                foreignKey: 'projectId',
+            },
+        ],
+    });
+
+
+    return APIresponse(res, MESSAGES.USER_CREATED,
+        managerProjects,
+    );
+});
+
+const getAllvenderprojects = catchAsync(async (req, res, next) => {
+    const { vendorIds } = req.query;
+    const projectsVender = await ProjectMember.findAll({
+        where: {
+            userId: vendorIds,
+            userType: "Vendor",
+        },
+        include: [
+            {
+                model: Project,
+                attributes: ['id', 'title', 'descriptions', 'startDate', 'estimationTime', 'userId'],
+                foreignKey: 'projectId',
+            },
+        ],
+    });
+
+
+    return APIresponse(res, MESSAGES.USER_CREATED,
+        projectsVender,
+    );
+});
+const getAllclientprojects = catchAsync(async (req, res, next) => {
+    const { clientIds } = req.query;
+    const clientprojects = await Project.findAndCountAll({
+        where: {
+            userId: clientIds,
+        },
+    });
+    return APIresponse(res, "Success",
+        clientprojects,
+    );
+});
+
+
 
 module.exports = {
     addProject,
-    asigningProject
+    asigningProject,
+    getAllmangerprojects,
+    getAllworkerProjects,
+    getAllvenderprojects,
+    getAllclientprojects
 }
